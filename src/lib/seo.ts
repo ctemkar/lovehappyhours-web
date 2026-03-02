@@ -19,6 +19,7 @@ export function baseMetadata(overrides: Partial<Metadata> = {}): Metadata {
       type: 'website',
       siteName: SITE_NAME,
       locale: 'en_US',
+      images: [{ url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&h=630&fit=crop', width: 1200, height: 630, alt: 'Love Happy Hours — Find the Best Deals Near You' }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -41,6 +42,7 @@ export function cityMetadata(city: City): Metadata {
       title: `Best Happy Hours & Deals in ${city.name}`,
       description: `Find the best deals in ${city.name} — happy hours, spa deals, restaurant promotions and more.`,
       url: `${SITE_URL}/${city.slug}/`,
+      images: city.image ? [{ url: city.image, width: 1200, height: 600, alt: `${city.name} happy hours` }] : undefined,
     },
   }
 }
@@ -56,6 +58,7 @@ export function venueMetadata(venue: Venue): Metadata {
       description: `${dealSummary} at ${venue.name}, ${venue.neighborhood}.`,
       url: `${SITE_URL}/venue/${venue.slug}/`,
       type: 'article',
+      images: venue.coverImage ? [{ url: venue.coverImage, width: 800, height: 600, alt: venue.name }] : undefined,
     },
   }
 }

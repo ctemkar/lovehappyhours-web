@@ -14,7 +14,7 @@ export const cities: City[] = [
     isActive: true,
     emoji: '🇹🇭',
     venueCount: 177,
-    image: '/images/cities/bangkok.jpg',
+    image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1200&h=600&fit=crop',
     neighborhoods: [
       { name: 'Thonglor', slug: 'thonglor', latitude: 13.7302, longitude: 100.5826, description: 'Bangkok\'s trendiest neighborhood with upscale bars and nightlife.' },
       { name: 'Ekkamai', slug: 'ekkamai', latitude: 13.7222, longitude: 100.5872, description: 'Laid-back craft beer bars, hipster cafes, and artisanal eateries.' },
@@ -47,7 +47,7 @@ export const cities: City[] = [
     isActive: true,
     emoji: '🇮🇳',
     venueCount: 60,
-    image: '/images/cities/mumbai.jpg',
+    image: 'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=1200&h=600&fit=crop',
     neighborhoods: [
       { name: 'Worli', slug: 'worli', latitude: 19.0176, longitude: 72.8153, description: 'Upscale area with sea views and premium bars.' },
       { name: 'Lower Parel', slug: 'lower-parel', latitude: 18.998, longitude: 72.8311, description: 'Hip mill-compound district with craft breweries and pubs.' },
@@ -73,7 +73,7 @@ export const cities: City[] = [
     isActive: true,
     emoji: '🇹🇭',
     venueCount: 40,
-    image: '/images/cities/pattaya.jpg',
+    image: 'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=1200&h=600&fit=crop',
     neighborhoods: [
       { name: 'Pattaya Beach', slug: 'pattaya-beach', latitude: 12.9271, longitude: 100.8779, description: 'Main beach strip with hotels and rooftop bars.' },
       { name: 'Walking Street', slug: 'walking-street', latitude: 12.9262, longitude: 100.8725, description: 'Famous nightlife strip with bars and clubs.' },
@@ -94,7 +94,7 @@ export const cities: City[] = [
     isActive: true,
     emoji: '🇺🇸',
     venueCount: 65,
-    image: '/images/cities/nyc.jpg',
+    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200&h=600&fit=crop',
     neighborhoods: [
       { name: 'FiDi', slug: 'fidi', latitude: 40.7075, longitude: -74.0089, description: 'Historic financial district with iconic cocktail bars.' },
       { name: 'East Village', slug: 'east-village', latitude: 40.7265, longitude: -73.9815, description: 'Dive bars, cocktail dens, and late-night eats.' },
