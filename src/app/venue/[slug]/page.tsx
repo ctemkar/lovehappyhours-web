@@ -9,6 +9,7 @@ import { formatTimeRange, formatDaysActive, formatPriceRange, isDealActiveNow } 
 import Breadcrumbs from '@/components/seo/Breadcrumbs'
 import JsonLd from '@/components/seo/JsonLd'
 import MapPlaceholder from '@/components/venue/MapPlaceholder'
+import { PhotoGallery } from '@/components/photo-gallery'
 
 export function generateStaticParams() {
   return venues.map(v => ({ slug: v.slug }))
@@ -87,6 +88,14 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
                 )}
               </div>
             </div>
+
+            {/* Photo Gallery */}
+            {venue.photos && venue.photos.length > 0 && (
+              <div className="mt-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Photos</h2>
+                <PhotoGallery photos={venue.photos} venueName={venue.name} />
+              </div>
+            )}
 
             {/* Deals */}
             <div className="mt-6">
