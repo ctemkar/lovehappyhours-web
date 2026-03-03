@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseServer } from '@/lib/supabase-client';
 import { scrapeVenuePhotos, formatPhotosForStorage } from '@/lib/photo-scraper';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,9 +12,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Scrape photos
     console.log(`[API] Scraping photos for venue ${venueId} from ${websiteUrl}`);
@@ -33,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Format and store in Supabase
     const photoUrls = formatPhotosForStorage(scrapedPhotos);
 
-    const { error } = await supabase
+    const { error } = await supabaseServer
       .from('venues')
       .update({ photos: photoUrls })
       .eq('id', venueId);
@@ -76,8 +70,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get venue details
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data: venue, error } = await supabase
+    const { data: venue, error } = await supabaseServer
       .from('venues')
       .select('id, website')
       .eq('id', venueId)
@@ -104,7 +97,7 @@ export async function GET(request: NextRequest) {
     const photoUrls = formatPhotosForStorage(scrapedPhotos);
 
     // Update venue
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseServer
       .from('venues')
       .update({ photos: photoUrls })
       .eq('id', venueId);
