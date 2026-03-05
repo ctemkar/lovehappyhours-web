@@ -4,7 +4,7 @@ import { type Venue, type Deal, type City, type BlogPost, CATEGORY_MAP } from '@
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lovehappyhours.com'
 const SITE_NAME = 'Love Happy Hours'
 
-export function baseMetadata(overrides: Partial<Metadata> = {}): Metadata {
+export function baseMetadata(overrides: Partial<Metadata> = {}, canonicalPath?: string): Metadata {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
@@ -15,6 +15,12 @@ export function baseMetadata(overrides: Partial<Metadata> = {}): Metadata {
     keywords: ['happy hour', 'deals', 'bars', 'restaurants', 'spas', 'bangkok', 'daily deals'],
     authors: [{ name: SITE_NAME }],
     creator: SITE_NAME,
+    alternates: {
+      canonical: canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined,
+      languages: {
+        'en': SITE_URL,
+      },
+    },
     openGraph: {
       type: 'website',
       siteName: SITE_NAME,
@@ -34,7 +40,17 @@ export function baseMetadata(overrides: Partial<Metadata> = {}): Metadata {
   }
 }
 
-export function cityMetadata(city: City): Metadata {
+export function neighborhoodMetadata(city: City, neighborhood: { name: string; slug: string; description: string }): Metadata {
+  return {
+    title: `Best Happy Hours & Deals in ${neighborhood.name}, ${city.name}`,
+    description: `Discover the best happy hours and deals in ${neighborhood.name}, ${city.name}. ${neighborhood.description} Find bars, restaurants, spas and more with current promotions.`,
+    openGraph: {
+      title: `Happy Hours in ${neighborhood.name}, ${city.name}`,
+      description: `${neighborhood.description} Find the best deals near you.`,
+      url: `${SITE_URL}/${city.slug}/${neighborhood.slug}/`,
+    },
+  }
+}
   return {
     title: `Best Happy Hours & Deals in ${city.name} ${city.emoji}`,
     description: `Discover ${city.venueCount}+ happy hours, daily deals, and promotions at bars, restaurants, spas, and more in ${city.name}. Find what's happening right now.`,
