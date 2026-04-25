@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "/var/www/happy_hours_website/frontend/public/images/venues"
+UPLOAD_DIR = "/var/www/flexhappyhours/frontend/public/images/venues"
 PAGE_SIZE = 12
 
 REVIEW_TAGS = [

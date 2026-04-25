@@ -1,7 +1,11 @@
+// Full updated index.js (Home component) - mobile-edge-clipping fixes applied (row neutralized + safe-area padding)
 import { useEffect, useState, useRef, useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ThemeContext } from "./_app";
 
+/* -------------------------
+   Helpers (unchanged)
+   ------------------------- */
 function secondsToHHMM(val) {
   if (val === null || val === undefined) return null;
   if (typeof val === "string") {
@@ -297,6 +301,10 @@ function mergeUniqueVenues(current, incoming) {
   return Array.from(map.values());
 }
 
+/* -------------------------
+   Small UI components
+   ------------------------- */
+
 function StarRating({ rating, max = 5, size = 16, interactive = false, onRate }) {
   const [hovered, setHovered] = useState(0);
 
@@ -357,6 +365,11 @@ const QUICK_TAGS = [
   "Friendly staff", "Slow service", "Good food", "Nice ambience",
   "Value for money", "Must visit",
 ];
+
+/* -------------------------
+   ReviewsSection, BookmarkButton, QuickActionButton
+   (kept as in original)
+   ------------------------- */
 
 function ReviewsSection({ venueId }) {
   const [reviews, setReviews] = useState([]);
@@ -730,6 +743,11 @@ function QuickActionButton({ label, onClick, href, variant = "secondary" }) {
   );
 }
 
+/* -------------------------
+   VenueModal & VenueCard
+   (kept same, with class names for CSS targeting)
+   ------------------------- */
+
 function VenueModal({ venue, onClose, onToggleBookmark, bookmarkBusy, onShareVenue }) {
   if (!venue) return null;
 
@@ -955,10 +973,10 @@ function VenueCard({
   return (
     <div className="col-12 col-md-6 col-xl-4 mb-4">
       <div
-        className="card h-100 border-0"
+        className="card venue-card h-100 border-0"
         style={{
           borderRadius: "22px",
-          overflow: "hidden",
+          overflow: "visible", // allow drop shadows and small overhangs without clipping
           background: "var(--card-bg)",
           boxShadow: "0 14px 40px rgba(15,23,42,0.08)",
           transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -975,10 +993,11 @@ function VenueCard({
         }}
         onClick={() => onViewDetails(v)}
       >
-        <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
+        <div className="venue-image-wrap" style={{ position: "relative", overflow: "hidden", borderTopLeftRadius: "22px", borderTopRightRadius: "22px" }}>
           <img
+            className="venue-card-img"
             src={displayImage}
-            style={{ width: "100%", height: "220px", objectFit: "cover", display: "block" }}
+            style={{ width: "100%", objectFit: "cover", display: "block" }}
             alt={v.name || "venue"}
             onError={(e) => {
               e.target.src = "https://via.placeholder.com/400x220?text=No+Photo";
@@ -1063,7 +1082,7 @@ function VenueCard({
           <div style={{ position: "absolute", left: "16px", right: "16px", bottom: "14px", color: "#fff", zIndex: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "flex-end" }}>
               <div style={{ minWidth: 0 }}>
-                <h5 style={{ fontWeight: "800", fontSize: "18px", marginBottom: "4px", lineHeight: 1.2 }}>
+                <h5 style={{ fontWeight: "800", marginBottom: "4px", fontSize: "18px", lineHeight: 1.2 }}>
                   {v.name}
                 </h5>
                 <p
@@ -1084,7 +1103,7 @@ function VenueCard({
           </div>
         </div>
 
-        <div className="card-body" style={{ padding: "18px", background: "var(--card-bg)" }}>
+        <div className="card-body card-body-custom" style={{ padding: "14px", background: "var(--card-bg)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", marginBottom: "10px" }}>
             <div style={{ minWidth: 0 }}>
               <div style={{ marginBottom: "6px" }}>
@@ -1129,11 +1148,11 @@ function VenueCard({
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "10px",
-              marginBottom: "12px",
+              gap: "8px",
+              marginBottom: "10px",
             }}
           >
-            <div style={{ background: "var(--surface)", borderRadius: "14px", padding: "10px 12px", border: "1px solid var(--border)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "14px", padding: "10px 10px", border: "1px solid var(--border)" }}>
               <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px", fontWeight: "700", textTransform: "uppercase" }}>
                 Venue Hours
               </div>
@@ -1141,7 +1160,7 @@ function VenueCard({
                 {openStr || "--"} - {closeStr || "--"}
               </div>
             </div>
-            <div style={{ background: "var(--surface)", borderRadius: "14px", padding: "10px 12px", border: "1px solid var(--border)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "14px", padding: "10px 10px", border: "1px solid var(--border)" }}>
               <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px", fontWeight: "700", textTransform: "uppercase" }}>
                 Happy Hour
               </div>
@@ -1157,8 +1176,8 @@ function VenueCard({
               border: `1.5px solid ${dealText ? status?.color || "#198754" : "var(--border)"}`,
               borderRadius: "16px",
               padding: "12px",
-              marginBottom: "14px",
-              minHeight: "74px",
+              marginBottom: "12px",
+              minHeight: "68px",
             }}
           >
             <div style={{ fontSize: "11px", color: dealText ? status?.color || "#198754" : "var(--text-muted)", fontWeight: "800", textTransform: "uppercase", marginBottom: "6px" }}>
@@ -1245,9 +1264,14 @@ function VenueCard({
   );
 }
 
+/* -------------------------
+   Main Page (Home) - mobile-first + sliding panel overlay (fixed on small screens)
+   ------------------------- */
+
 export default function Home() {
   const { dark, toggleTheme } = useContext(ThemeContext);
 
+  /* state hooks (unchanged) */
   const [venues, setVenues] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedCityId, setSelectedCityId] = useState("");
@@ -1283,6 +1307,11 @@ export default function Home() {
 
   const sentinelRef = useRef(null);
   const coordsRef = useRef(null);
+
+  // top drawer state & touch handlers
+  const [panelOpen, setPanelOpen] = useState(true); // start open
+  const touchStartYRef = useRef(null);
+  const touchEndYRef = useRef(null);
 
   useEffect(() => {
     setClientId(getClientId());
@@ -1740,331 +1769,489 @@ export default function Home() {
 
   const savedCount = venues.filter((v) => v.bookmarked).length;
 
+  /* -------------------------
+     Responsive CSS + sliding panel overlay (fixed on small screens)
+     + safe-area & mobile padding to avoid left-edge clipping
+     ------------------------- */
+  const responsiveStyles = `
+    /* global */
+    html, body, #__next { margin: 0; padding: 0; box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+    *, *:before, *:after { box-sizing: inherit; }
+
+    /* safe area (iOS) fallback and default side padding */
+    :root {
+      --safe-left: env(safe-area-inset-left, 12px);
+      --safe-right: env(safe-area-inset-right, 12px);
+    }
+
+    .container-fluid.app-root {
+      padding-left: calc(12px + var(--safe-left));
+      padding-right: calc(12px + var(--safe-right));
+    }
+
+    /* panel */
+    .sliding-panel {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 999;
+      transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms;
+      will-change: transform;
+      pointer-events: auto;
+      display: block;
+    }
+
+    .sliding-panel.open { transform: translateY(0); }
+    .sliding-panel.closed { transform: translateY(calc(-100% + 64px)); }
+
+    .sliding-panel .panel-inner {
+      height: auto;
+      margin: 0 8px;
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(148,163,184,0.12);
+      background: var(--panel-bg, #fff);
+      box-shadow: 0 12px 34px rgba(15,23,42,0.06);
+      position: relative;
+      overflow: visible;
+    }
+
+    .panel-toggle { position: absolute; right: 12px; top: 12px; z-index: 1000; }
+    .panel-handle { position: absolute; left: 50%; transform: translateX(-50%); bottom: 10px; top: auto; width: 56px; height: 24px; }
+
+    .hero h1 { font-size: clamp(18px, 6vw, 28px); margin: 0 0 6px 0; }
+
+    /* VENUE GRID SAFE PADDING: small left/right padding for mobile + keep small column gutters */
+    .venue-grid {
+      /* default: no extra space on desktop, mobile rules below */
+    }
+
+    @media (max-width: 767px) {
+      /* give the whole page a small safe padding on mobile (in addition to container-fluid) */
+      .page-wrapper { padding-left: 0; padding-right: 0; }
+
+      /* top drawer style: let the panel sit at the top and collapse vertically */
+      .sliding-panel {
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .sliding-panel.closed {
+        transform: translateY(calc(-100% + 64px));
+      }
+
+      /* small safe padding specifically for the venue grid so text & rounded corners aren't flush */
+      .venue-grid { padding-left: 12px; padding-right: 12px; }
+
+      /* keep col gutters but small - avoid zeroing gutters completely */
+      .venue-grid > [class*="col-"] { padding-left: 6px !important; padding-right: 6px !important; }
+
+      /* ensure cards don't have overflow hidden at root (so shadows & small overlays aren't clipped) */
+      .venue-card { overflow: visible !important; }
+
+      /* but keep image wrapper clipping for rounded corners */
+      .venue-image-wrap { overflow: hidden; border-top-left-radius: 22px; border-top-right-radius: 22px; }
+
+      /* slightly smaller images on tight screens */
+      .venue-card-img { height: 140px; }
+
+      /* make sure text has breathing room */
+      .card-body-custom { padding-left: 12px !important; padding-right: 12px !important; }
+
+      /* mobile top drawer handle centered at bottom of the visible strip */
+      .panel-handle {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 12px;
+        top: auto;
+        width: 56px;
+        height: 24px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .sliding-panel { position: sticky; top: 10px; }
+      .sliding-panel.closed { transform: translateX(0); }
+      .panel-handle { display: none; }
+      .floating-open-btn { display: none; }
+      .panel-inner { margin: 0; border-radius: 24px; padding: 18px; }
+      .venue-card-img { height: 220px; }
+      .venue-grid > [class*="col-"] { padding-left: 12px !important; padding-right: 12px !important; }
+    }
+  `;
+
+  // touch handlers for simple vertical swipe detection
+  function handleTouchStart(e) {
+    touchStartYRef.current = e.touches?.[0]?.clientY ?? null;
+    touchEndYRef.current = null;
+  }
+
+  function handleTouchMove(e) {
+    touchEndYRef.current = e.touches?.[0]?.clientY ?? null;
+  }
+
+  function handleTouchEnd() {
+    const start = touchStartYRef.current;
+    const end = touchEndYRef.current;
+    if (start == null || end == null) return;
+    const delta = end - start;
+    // swipe up -> close panel; swipe down -> open panel
+    if (delta < -40) {
+      setPanelOpen(false);
+    } else if (delta > 40) {
+      setPanelOpen(true);
+    }
+  }
+
+  function togglePanel(e) {
+    e?.stopPropagation();
+    setPanelOpen((v) => !v);
+  }
+
   return (
     <div
-      className="container-fluid px-3 px-md-4 py-3"
+      className="container-fluid app-root px-0"
       style={{
         background: "var(--bg)",
         minHeight: "100vh",
       }}
     >
+      <style>{responsiveStyles}</style>
+
       <div
-        style={{
-          maxWidth: "1280px",
-          margin: "0 auto",
-        }}
+        className="page-wrapper"
+        style={{ maxWidth: "1280px", margin: "0 auto", position: "relative" }}
       >
+        {/* Sliding panel: fixed overlay on small screens, sticky on desktop */}
         <div
-          style={{
-            background: dark
-              ? "linear-gradient(135deg, #0f172a 0%, #172554 100%)"
-              : "linear-gradient(135deg, #fff7ed 0%, #eff6ff 100%)",
-            borderRadius: "28px",
-            padding: "24px",
-            marginBottom: "18px",
-            border: "1px solid rgba(148,163,184,0.14)",
-            boxShadow: "0 16px 50px rgba(15,23,42,0.08)",
-          }}
+          className={`sliding-panel ${panelOpen ? "open" : "closed"}`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          aria-hidden={!panelOpen}
         >
-          <div className="d-flex align-items-start justify-content-between flex-wrap gap-3">
-            <div style={{ maxWidth: "720px" }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  background: dark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.85)",
-                  color: "var(--text)",
-                  borderRadius: "999px",
-                  padding: "8px 12px",
-                  fontSize: "12px",
-                  fontWeight: "800",
-                  marginBottom: "14px",
-                }}
-              >
-                <span>Happy Hours</span>
-                <span style={{ opacity: 0.55 }}>•</span>
-                <span>{liveCount} live now</span>
-              </div>
-              <h1 style={{ fontWeight: "900", marginBottom: "8px", color: "var(--text)", fontSize: "clamp(28px, 4vw, 42px)" }}>
-                Discover the best nearby happy hour deals.
-              </h1>
-              <p style={{ color: "var(--text-muted)", fontSize: "15px", margin: 0, maxWidth: "640px" }}>
-                Cleaner browsing, faster scanning, and one-tap bookmarking so users can save places before they forget.
-              </p>
-            </div>
-
-            <button
-              onClick={toggleTheme}
-              style={{
-                background: dark ? "#f8fafc" : "#111827",
-                color: dark ? "#111827" : "#f8fafc",
-                border: "none",
-                borderRadius: "999px",
-                padding: "10px 18px",
-                fontSize: "14px",
-                fontWeight: "700",
-                cursor: "pointer",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.16)",
-              }}
-            >
-              {dark ? "Light Mode" : "Dark Mode"}
+          <div className={`panel-inner ${dark ? "dark" : "light"}`}>
+            <button className="panel-toggle" aria-label={panelOpen ? "Collapse" : "Open"} onClick={togglePanel}>
+              {panelOpen ? "Hide" : "Show"}
             </button>
-          </div>
 
-          <div className="row g-3 mt-1">
-            <div className="col-6 col-md-3">
-              <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: "20px", padding: "14px", border: "1px solid rgba(255,255,255,0.6)" }}>
-                <div style={{ fontSize: "12px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Total venues</div>
-                <div style={{ fontSize: "28px", fontWeight: "900", color: "#101828" }}>{total}</div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: "20px", padding: "14px", border: "1px solid rgba(255,255,255,0.6)" }}>
-                <div style={{ fontSize: "12px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Live now</div>
-                <div style={{ fontSize: "28px", fontWeight: "900", color: "#067647" }}>{liveCount}</div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: "20px", padding: "14px", border: "1px solid rgba(255,255,255,0.6)" }}>
-                <div style={{ fontSize: "12px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Saved places</div>
-                <div style={{ fontSize: "28px", fontWeight: "900", color: "#b54708" }}>{savedCount}</div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: "20px", padding: "14px", border: "1px solid rgba(255,255,255,0.6)" }}>
-                <div style={{ fontSize: "12px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Mode</div>
-                <div style={{ fontSize: "20px", fontWeight: "900", color: "#101828" }}>{viewMode === "saved" ? "Saved" : "Discover"}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: "var(--card-bg)",
-            border: "1px solid var(--border)",
-            borderRadius: "24px",
-            padding: "18px",
-            marginBottom: "22px",
-            boxShadow: "0 12px 34px rgba(15,23,42,0.04)",
-            position: "sticky",
-            top: "10px",
-            zIndex: 20,
-          }}
-        >
-          {shareMessage && (
-            <div
-              style={{
-                marginBottom: "12px",
-                background: "#eefbf3",
-                color: "#157347",
-                border: "1px solid #b7ebcd",
-                borderRadius: "14px",
-                padding: "10px 12px",
-                fontSize: "13px",
-                fontWeight: "700",
-              }}
-            >
-              {shareMessage}
-            </div>
-          )}
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-            <div className="d-flex flex-wrap gap-2">
-              {[
-                { key: "discover", label: "Discover" },
-                { key: "saved", label: "Saved" },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => switchViewMode(item.key)}
-                  style={{
-                    borderRadius: "999px",
-                    border: `1px solid ${viewMode === item.key ? "#111827" : "var(--border)"}`,
-                    background: viewMode === item.key ? "#111827" : "var(--surface)",
-                    color: viewMode === item.key ? "#fff" : "var(--text)",
-                    padding: "9px 14px",
-                    fontSize: "13px",
-                    fontWeight: "800",
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="d-flex align-items-center gap-2 flex-wrap">
-              <input
-                value={activeSearch}
-                onChange={(e) => setActiveSearch(e.target.value)}
-                placeholder="Search venues, areas or deals"
-                style={{
-                  minWidth: "240px",
-                  background: "var(--surface)",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "999px",
-                  padding: "10px 14px",
-                  fontSize: "13px",
-                  outline: "none",
-                }}
-              />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  background: "var(--surface)",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "999px",
-                  padding: "10px 14px",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                }}
-              >
-                <option value="live">Sort: Best timing</option>
-                <option value="nearest">Sort: Nearest</option>
-                <option value="rating">Sort: Top rated</option>
-                <option value="saved">Sort: Saved first</option>
-              </select>
-            </div>
-          </div>
-
-          {viewMode === "discover" && (
-            <>
-              <div className="row g-2 mb-3">
-                <div className="col-12 col-md-4">
-                  <select
-                    className="form-select"
-                    value={selectedCityId}
-                    onChange={onCityChange}
-                    style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
+            {/* hero */}
+            <div className="hero" style={{ paddingRight: 72 }}>
+              <div style={{ display: "flex", gap: "12px", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap" }}>
+                <div style={{ maxWidth: "720px" }}>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      background: dark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.85)",
+                      color: "var(--text)",
+                      borderRadius: "999px",
+                      padding: "6px 10px",
+                      fontSize: "12px",
+                      fontWeight: "800",
+                      marginBottom: "10px",
+                    }}
                   >
-                    <option value="">Auto-detect nearest city</option>
-                    {cities.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  {err && (
-                    <div style={{ color: "var(--text-muted)" }} className="small mt-1">
-                      {err}
-                    </div>
-                  )}
+                    <span>Happy Hours</span>
+                    <span style={{ opacity: 0.55 }}>•</span>
+                    <span>{liveCount} live now</span>
+                  </div>
+                  <h1>Discover the best nearby happy hour deals.</h1>
+                  <p className="lead">
+                    Cleaner browsing, faster scanning, and one-tap bookmarking so users can save places before they forget.
+                  </p>
                 </div>
 
-                {filterOptions.categories.length > 0 && (
-                  <div className="col-12 col-md-3">
-                    <select
-                      className="form-select"
-                      value={activeCategory}
-                      onChange={(e) => onCategoryChange(e.target.value)}
-                      style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
-                    >
-                      <option value="">All Categories</option>
-                      {filterOptions.categories.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {filterOptions.areas.length > 0 && (
-                  <div className="col-12 col-md-3">
-                    <select
-                      className="form-select"
-                      value={activeArea}
-                      onChange={(e) => onAreaChange(e.target.value)}
-                      style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
-                    >
-                      <option value="">All Areas</option>
-                      {filterOptions.areas.map((a) => (
-                        <option key={a} value={a}>
-                          {a}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {filterOptions.price_ranges.length > 0 && (
-                  <div className="col-12 col-md-2">
-                    <select
-                      className="form-select"
-                      value={activePriceRange}
-                      onChange={(e) => onPriceChange(e.target.value)}
-                      style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
-                    >
-                      <option value="">All Prices</option>
-                      {filterOptions.price_ranges.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <button
+                  onClick={toggleTheme}
+                  style={{
+                    background: dark ? "#f8fafc" : "#111827",
+                    color: dark ? "#111827" : "#f8fafc",
+                    border: "none",
+                    borderRadius: "999px",
+                    padding: "8px 12px",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.16)",
+                    height: "40px",
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  {dark ? "Light" : "Dark"}
+                </button>
               </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px", alignItems: "center" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "800" }}>Distance</span>
-                {[null, 2, 5, 10, 20].map((km) => (
-                  <button
-                    key={km ?? "all"}
-                    onClick={() => setActiveDistance(km)}
+              <div className="row g-2 mt-2 hero-stats">
+                <div className="col-6 col-md-3">
+                  <div className="stat-card" style={{ background: "rgba(255,255,255,0.72)" }}>
+                    <div style={{ fontSize: "11px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Total venues</div>
+                    <div style={{ fontSize: "22px", fontWeight: "900", color: "#101828" }}>{total}</div>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div className="stat-card" style={{ background: "rgba(255,255,255,0.72)" }}>
+                    <div style={{ fontSize: "11px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Live now</div>
+                    <div style={{ fontSize: "22px", fontWeight: "900", color: "#067647" }}>{liveCount}</div>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div className="stat-card" style={{ background: "rgba(255,255,255,0.72)" }}>
+                    <div style={{ fontSize: "11px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Saved places</div>
+                    <div style={{ fontSize: "22px", fontWeight: "900", color: "#b54708" }}>{savedCount}</div>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div className="stat-card" style={{ background: "rgba(255,255,255,0.72)" }}>
+                    <div style={{ fontSize: "11px", color: "#475467", fontWeight: "800", textTransform: "uppercase", marginBottom: "4px" }}>Mode</div>
+                    <div style={{ fontSize: "18px", fontWeight: "900", color: "#101828" }}>{viewMode === "saved" ? "Saved" : "Discover"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* filters */}
+            <div className="filters-bar" style={{ marginTop: 8 }}>
+              {shareMessage && (
+                <div
+                  style={{
+                    marginBottom: "12px",
+                    background: "#eefbf3",
+                    color: "#157347",
+                    border: "1px solid #b7ebcd",
+                    borderRadius: "14px",
+                    padding: "10px 12px",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                  }}
+                >
+                  {shareMessage}
+                </div>
+              )}
+
+              <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div className="d-flex flex-wrap gap-2">
+                  {[
+                    { key: "discover", label: "Discover" },
+                    { key: "saved", label: "Saved" },
+                  ].map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => switchViewMode(item.key)}
+                      style={{
+                        borderRadius: "999px",
+                        border: `1px solid ${viewMode === item.key ? "#111827" : "var(--border)"}`,
+                        background: viewMode === item.key ? "#111827" : "var(--surface)",
+                        color: viewMode === item.key ? "#fff" : "var(--text)",
+                        padding: "8px 12px",
+                        fontSize: "13px",
+                        fontWeight: "800",
+                      }}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="d-flex align-items-center gap-2 flex-wrap">
+                  <input
+                    value={activeSearch}
+                    onChange={(e) => setActiveSearch(e.target.value)}
+                    placeholder="Search venues, areas or deals"
                     style={{
-                      padding: "8px 14px",
+                      minWidth: "140px",
+                      background: "var(--surface)",
+                      color: "var(--text)",
+                      border: "1px solid var(--border)",
                       borderRadius: "999px",
-                      fontSize: "12px",
-                      fontWeight: "800",
-                      cursor: "pointer",
-                      border: "1px solid",
-                      background: activeDistance === km ? "#0d6efd" : "var(--surface)",
-                      color: activeDistance === km ? "#fff" : "var(--text)",
-                      borderColor: activeDistance === km ? "#0d6efd" : "var(--border)",
+                      padding: "8px 12px",
+                      fontSize: "13px",
+                      outline: "none",
+                    }}
+                  />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--text)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "999px",
+                      padding: "8px 12px",
+                      fontSize: "13px",
+                      fontWeight: "700",
                     }}
                   >
-                    {km === null ? "All" : `< ${km} km`}
-                  </button>
-                ))}
+                    <option value="live">Sort: Best timing</option>
+                    <option value="nearest">Sort: Nearest</option>
+                    <option value="rating">Sort: Top rated</option>
+                    <option value="saved">Sort: Saved first</option>
+                  </select>
+                </div>
               </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "800" }}>Status</span>
-                {[
-                  { key: "", label: "All" },
-                  { key: "live", label: "Live Now" },
-                  { key: "ending", label: "Ending Soon" },
-                  { key: "starting", label: "Starting Soon" },
-                  { key: "later", label: "Later Today" },
-                  { key: "ended", label: "Ended" },
-                ].map(({ key, label }) => (
-                  <button
-                    key={key || "all-status"}
-                    onClick={() => setActiveStatusFilter(key)}
-                    style={{
-                      padding: "8px 14px",
-                      borderRadius: "999px",
-                      fontSize: "12px",
-                      fontWeight: "800",
-                      cursor: "pointer",
-                      border: "1px solid",
-                      background: activeStatusFilter === key ? "#198754" : "var(--surface)",
-                      color: activeStatusFilter === key ? "#fff" : "var(--text)",
-                      borderColor: activeStatusFilter === key ? "#198754" : "var(--border)",
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+              {viewMode === "discover" && (
+                <>
+                  <div className="row g-2 mb-2">
+                    <div className="col-12 col-md-4">
+                      <select
+                        className="form-select"
+                        value={selectedCityId}
+                        onChange={onCityChange}
+                        style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
+                      >
+                        <option value="">Auto-detect nearest city</option>
+                        {cities.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      {err && (
+                        <div style={{ color: "var(--text-muted)" }} className="small mt-1">
+                          {err}
+                        </div>
+                      )}
+                    </div>
+
+                    {filterOptions.categories.length > 0 && (
+                      <div className="col-12 col-md-3">
+                        <select
+                          className="form-select"
+                          value={activeCategory}
+                          onChange={(e) => onCategoryChange(e.target.value)}
+                          style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
+                        >
+                          <option value="">All Categories</option>
+                          {filterOptions.categories.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {filterOptions.areas.length > 0 && (
+                      <div className="col-12 col-md-3">
+                        <select
+                          className="form-select"
+                          value={activeArea}
+                          onChange={(e) => onAreaChange(e.target.value)}
+                          style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
+                        >
+                          <option value="">All Areas</option>
+                          {filterOptions.areas.map((a) => (
+                            <option key={a} value={a}>
+                              {a}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {filterOptions.price_ranges.length > 0 && (
+                      <div className="col-12 col-md-2">
+                        <select
+                          className="form-select"
+                          value={activePriceRange}
+                          onChange={(e) => onPriceChange(e.target.value)}
+                          style={{ background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)", borderRadius: "16px" }}
+                        >
+                          <option value="">All Prices</option>
+                          {filterOptions.price_ranges.map((p) => (
+                            <option key={p} value={p}>
+                              {p}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "800" }}>Distance</span>
+                    {[null, 2, 5, 10, 20].map((km) => (
+                      <button
+                        key={km ?? "all"}
+                        onClick={() => setActiveDistance(km)}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "999px",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          border: "1px solid",
+                          background: activeDistance === km ? "#0d6efd" : "var(--surface)",
+                          color: activeDistance === km ? "#fff" : "var(--text)",
+                          borderColor: activeDistance === km ? "#0d6efd" : "var(--border)",
+                        }}
+                      >
+                        {km === null ? "All" : `< ${km} km`}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "800" }}>Status</span>
+                    {[
+                      { key: "", label: "All" },
+                      { key: "live", label: "Live Now" },
+                      { key: "ending", label: "Ending Soon" },
+                      { key: "starting", label: "Starting Soon" },
+                      { key: "later", label: "Later Today" },
+                      { key: "ended", label: "Ended" },
+                    ].map(({ key, label }) => (
+                      <button
+                        key={key || "all-status"}
+                        onClick={() => setActiveStatusFilter(key)}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "999px",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          border: "1px solid",
+                          background: activeStatusFilter === key ? "#198754" : "var(--surface)",
+                          color: activeStatusFilter === key ? "#fff" : "var(--text)",
+                          borderColor: activeStatusFilter === key ? "#198754" : "var(--border)",
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="panel-handle" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: "#111827" }}>
+                <path d="M5 8l7 8 7-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
         </div>
 
+        {/* floating open button */}
+        {!panelOpen && (
+          <button
+            className="floating-open-btn"
+            aria-label="Open filters"
+            onClick={() => setPanelOpen(true)}
+            title="Open filters"
+            style={{ position: "fixed", right: 12 + (typeof window !== "undefined" ? parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-right') || 12) : 12), top: 12, zIndex: 1001 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M16 5L8 12l8 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+
+        {/* venues content */}
         {sortedVenues.length === 0 && !loading ? (
           <div className="text-center py-5">
             <p style={{ fontSize: "40px" }}>{viewMode === "saved" ? "★" : "🍺"}</p>
@@ -2075,7 +2262,7 @@ export default function Home() {
             </p>
           </div>
         ) : viewMode === "saved" ? (
-          <div className="row">
+          <div className="row venue-grid g-3">
             {sortedVenues.map((v, index) => (
               <VenueCard
                 key={v.id || index}
@@ -2098,7 +2285,7 @@ export default function Home() {
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
-                  marginBottom: "16px",
+                  marginBottom: "12px",
                   paddingBottom: "8px",
                   borderBottom: "2px solid var(--surface2)",
                 }}
@@ -2120,7 +2307,7 @@ export default function Home() {
                 </span>
               </div>
 
-              <div className="row">
+              <div className="row venue-grid g-3">
                 {group.venues.map((v, index) => (
                   <VenueCard
                     key={v.id || index}
